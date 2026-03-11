@@ -1,5 +1,19 @@
 # Path-Planning-Algorithms---Algoritmos-de-Planeamento-de-Rotas
-Here are some path planning algorithms that can be applied according to the intended context. The algorithms are A* in Python and C#, Theta* in Python, and FloodFill in C#. The heuristics used were Euclidean and Manhattan. The algorithm codes include a section dedicated to graphical visualization. 
+Presented here are some path planning algorithms, which can be applied according to the intended context. The algorithms are A* in Python and C#, Theta* in Python, and FloodFill in C#. The heuristics used were Euclidean and Manhattan. Within the algorithm codes, there is a section dedicated to the graphical visualization of the algorithm.
+
+In the C# folder, the file contains 2 algorithms: A* and FloodFill. This file was taken from the full simulation in Unity; in other words, it is an asset that was named Pathfinder.
+
+In the A portion:* The heuristic used was Manhattan and the language used was C#. The A* flow works as follows: it adds the starting point to an openSet; while there are nodes in the list, it takes the node with the lowest total cost. If this node is the destination, it reconstructs the path back (RetracePath). If not, it looks at the neighbors, calculates their costs, and adds them to the list to be visited.
+
+In the FloodFill part: It works like the "paint bucket" tool in Paint. It uses a Queue to visit one neighbor at a time, spreading like an oil slick until it finds no more free paths.
+
+In the Python folder, there are the following 2 algorithms: A* and Theta*.
+
+In A:* The algorithm is identical to the C# one, but made with the Python language and utilizes libraries present in Python, such as numpy and matplotlib.
+
+In Theta:* The algorithm uses a "vision sensor," and for this, it uses the Bresenham algorithm, which calculates which "pixels" (or grid squares) a straight line crosses to go from point A to point B. It also uses line_of_sight, which uses Bresenham to check each of these squares. If it finds an obstacle (!= 0), it returns False. If the path is clear, it says there is "line of sight." Then, instead of always connecting the current node to its immediate neighbor, Theta* looks at the parent of the current node. If there is a line of sight between the current node's parent and the neighbor, it ignores the current node and creates a straight line. This avoids that "staircase" jagged movement, as seen in A*. The heuristic used in this algorithm is Euclidean; this is necessary because the angles are now free, so we need the real distance between two points in space.
+
+In the Demonstrations folder are some images of the simulation in Unity and images of the simulation in VS CODE, along with some GIFs of the algorithms being used.
 
 ////
 
