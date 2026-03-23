@@ -3,6 +3,10 @@
 This repository features a collection of path planning algorithms designed for grid-based navigation, robotics, and game development. The project focuses on comparing different search strategies and visualization techniques across **Python** and **C# (Unity)**.
 
 
+## 📺 Demonstrations
+
+| Python Visualization (VS Code) |
+| :---: |
 | ![A* Algorithm](./Demonstrations/SimulationPython/gifs/astar3.gif) |
 
 
