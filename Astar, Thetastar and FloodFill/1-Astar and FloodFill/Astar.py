@@ -18,14 +18,14 @@ def astar_animado(mapa, start, goal):
     came_from = {}
     g_score = {start: 0}
     visited = set()
-    frames = []
+    frames =[]
     frame_count = 0
 
     while open_set:
         _, current = heapq.heappop(open_set)
 
         if current == goal:
-            path = []
+            path =[]
             while current in came_from:
                 path.append(current)
                 current = came_from[current]
@@ -46,7 +46,7 @@ def astar_animado(mapa, start, goal):
         if frame_count % 4 == 0:
             frames.append((visited.copy(), None))
 
-        for dx, dy in [(0,1),(1,0),(0,-1),(-1,0)]:
+        for dx, dy in[(0,1),(1,0),(0,-1),(-1,0)]:
             vizinho = (current[0]+dy, current[1]+dx)
             if (0 <= vizinho[0] < mapa.shape[0] 
                 and 0 <= vizinho[1] < mapa.shape[1] 
@@ -61,35 +61,61 @@ def astar_animado(mapa, start, goal):
     frames.append((visited.copy(), None))
     return None, frames
 
-# função para fazr animação
-def criar_animacao(mapa, frames, filename='astar.gif'):
+# Função para fazer animação modificada
+def criar_animacao(mapa, frames_originais, filename='astar.gif'):
     fig, ax = plt.subplots()
     cmap = ListedColormap(['white', 'black']) 
+    
+    # Inicia a imagem com o mapa
     img = ax.imshow(mapa, cmap=cmap)
-    path_line, = ax.plot([], [], 'b--', linewidth=2)  # caminho azul tracejado
+    path_line, = ax.plot([],[], 'b--', linewidth=2)  # caminho azul tracejado
     ax.set_title("A* Pathfinding")
 
+    # PREPARAÇÃO DOS FRAMES:
+    # Vamos reestruturar os frames para incluir a "fase" da animação
+    frames_completos =[]
+    
+    # 1º Passo: Mostrar o mapa original por 2 segundos (fps=20 -> 40 frames)
+    for _ in range(40):
+        # A tupla agora é: (Fase, Visitados, Caminho)
+        frames_completos.append(('mostrar_tudo', None, None))
+        
+    # 2º Passo: Adicionar os frames da exploração do A*
+    for visitados, caminho in frames_originais:
+        frames_completos.append(('explorar', visitados, caminho))
+
+
     def update(frame_data):
-        visitados, caminho = frame_data
-        overlay = np.zeros_like(mapa, dtype=float)
+        fase, visitados, caminho = frame_data
 
-        for y, x in visitados:
-            overlay[y, x] = 0.5  
+        if fase == 'mostrar_tudo':
+            # Mostra o mapa real (0=Branco, 1=Preto)
+            img.set_data(mapa)
+            path_line.set_data([],[])
+            
+        elif fase == 'explorar':
+            # Cria a "névoa de guerra": uma matriz toda preta (cheia de 1s)
+            tela_escura = np.ones_like(mapa)
+            
+            # Acende a luz onde o A* já visitou (transforma de 1 para 0)
+            if visitados:
+                for y, x in visitados:
+                    tela_escura[y, x] = 0
+            
+            # Atualiza os dados da imagem (muito mais rápido que usar imshow de novo)
+            img.set_data(tela_escura)
 
-        img.set_data(mapa)
-        img.set_alpha(1.0)
-        ax.imshow(overlay, cmap='gray', alpha=0.5)
-
-        if caminho:
-            ys, xs = zip(*caminho)
-            path_line.set_data(xs, ys)
-        else:
-            path_line.set_data([], [])
+            # Se houver caminho no final, desenha a linha azul
+            if caminho:
+                ys, xs = zip(*caminho)
+                path_line.set_data(xs, ys)
+            else:
+                path_line.set_data([], [])
 
         return [img, path_line]
 
     ani = animation.FuncAnimation(
-        fig, update, frames=frames, interval=100, blit=True, repeat=False
+        fig, update, frames=frames_completos, interval=100, blit=True, repeat=False
     )
 
     ani.save(filename, writer='pillow', fps=20)
@@ -97,10 +123,14 @@ def criar_animacao(mapa, frames, filename='astar.gif'):
 
 if __name__ == "__main__":
     mapa = gera_mapa(25, 25, perc_obstaculos=0.3)
+    # Garante que início e fim estão livres
+    mapa[0, 0] = 0 
+    mapa[24, 24] = 0 
+    
     path, frames = astar_animado(mapa, (0, 0), (24, 24))
     criar_animacao(mapa, frames, filename='astar0.gif')
 
-if path is None:
-    print("caminho não encontrado")
-else:
-    print(f"caminho encontrado com {len(path)} passos")
+    if path is None:
+        print("caminho não encontrado")
+    else:
+        print(f"caminho encontrado com {len(path)} passos")
